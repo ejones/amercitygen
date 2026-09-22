@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Surveyor — Procedural Colonial City</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script type="module" crossorigin src="./assets/index-vlA_t_G0.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-Ceu_q0yx.css">
+</head>
+<body>
+<aside id="panel">
+  <div class="cartouche">
+    <div class="eyebrow">A New &amp; Accurate Plan of</div>
+    <!-- placeholders until the first survey finishes and names the place -->
+    <h1 id="cityName">Surveying…</h1>
+    <div class="founded" id="cityFounded">a plan is being drawn</div>
+  </div>
+
+  <nav class="tabs" role="tablist" aria-label="Panel mode">
+    <button type="button" class="tab is-active" id="tabMap" role="tab" aria-selected="true" aria-controls="paneMap">Map</button>
+    <button type="button" class="tab" id="tabDesigner" role="tab" aria-selected="false" aria-controls="paneDesigner">Designer</button>
+  </nav>
+
+  <div class="pane" id="paneMap" role="tabpanel" aria-labelledby="tabMap">
+    <div class="section section--first">
+      <div class="timeline">
+        <div id="yearBig">2026</div>
+        <div id="eraName">Modern Metro</div>
+        <input type="range" id="year" min="1680" max="2026" value="2026" step="1" aria-label="Year">
+        <div class="ticks" id="yearTicks"></div>
+      </div>
+      <button id="btnCine" class="btn-quiet">▶ Play visualization</button>
+      <details id="cineConfig" class="disclosure">
+        <summary>Playback settings</summary>
+        <label for="cineSpeed">Viz speed</label>
+        <div class="row"><input type="range" id="cineSpeed" min="0.1" max="5.0" step="0.1" value="1.0"><span class="val" id="cineSpeedVal">1.0x</span></div>
+        <label for="cinePause">Era pause</label>
+        <div class="row"><input type="range" id="cinePause" min="0" max="5" step="0.5" value="0.5"><span class="val" id="cinePauseVal">0.5s</span></div>
+      </details>
+    </div>
+
+    <div class="section">
+      <h2>Survey</h2>
+      <div class="btnrow btnrow--stack">
+        <button id="regen">New city</button>
+        <button id="export">Save PNG</button>
+      </div>
+      <label for="sprawl">Sprawl extent</label>
+      <div class="row"><input type="range" id="sprawl" min="60" max="130" value="100"><span class="val" id="sprawlVal">100%</span></div>
+      <label for="density">Street density</label>
+      <div class="row"><input type="range" id="density" min="40" max="160" value="100"><span class="val" id="densityVal">100%</span></div>
+      <label class="toggle"><input type="checkbox" id="eraColor"> Tint roads by era</label>
+      <label class="toggle"><input type="checkbox" id="labels" checked> Place names</label>
+      <details class="disclosure">
+        <summary>Debug overlays</summary>
+        <label class="toggle"><input type="checkbox" id="showZoning"> Zoning map</label>
+        <label class="toggle"><input type="checkbox" id="showLandUse"> Land use map</label>
+      </details>
+    </div>
+
+    <div class="section" id="chronicleSection" hidden>
+      <h2>Chronicle</h2>
+      <div id="chronicleList"></div>
+    </div>
+
+    <div class="section">
+      <h2>Strata of the street grid</h2>
+      <ul class="legend">
+        <li><span class="chip" style="border-color:var(--era-colonial)"></span>Colonial core &amp; wharves<span class="yrs">1680–1775</span></li>
+        <li><span class="chip" style="border-color:var(--era-antebellum)"></span>Early Republic extension<span class="yrs">1776–1860</span></li>
+        <li><span class="chip" style="border-color:var(--era-streetcar)"></span>Rail &amp; streetcar fabric<span class="yrs">1861–1935</span></li>
+        <li><span class="chip" style="border-color:var(--era-postwar)"></span>Postwar cul-de-sacs<span class="yrs">1946–1979</span></li>
+        <li><span class="chip" style="border-color:var(--era-modern)"></span>Modern loops &amp; infill<span class="yrs">1980–now</span></li>
+      </ul>
+    </div>
+
+    <div class="section" id="zoningLegendSection" hidden>
+      <h2>Zoning districts</h2>
+      <ul class="legend">
+        <li><span class="chip-box" style="background-color:var(--zone-core-com)"></span>Core Commercial (CBD)</li>
+        <li><span class="chip-box" style="background-color:var(--zone-com)"></span>General Commercial</li>
+        <li><span class="chip-box" style="background-color:var(--zone-res-dense)"></span>Dense Residential</li>
+        <li><span class="chip-box" style="background-color:var(--zone-res-mid)"></span>Medium Residential</li>
+        <li><span class="chip-box" style="background-color:var(--zone-res-low)"></span>Low Residential</li>
+        <li><span class="chip-box" style="background-color:var(--zone-ind)"></span>Industrial</li>
+      </ul>
+    </div>
+
+    <div class="section" id="landUseLegendSection" hidden>
+      <h2>Land use</h2>
+      <ul class="legend">
+        <li><span class="chip-box" style="background-color:var(--use-core-com)"></span>Core Commercial (CBD)</li>
+        <li><span class="chip-box" style="background-color:var(--use-com)"></span>General Commercial</li>
+        <li><span class="chip-box" style="background-color:var(--use-res-dense)"></span>Dense Residential</li>
+        <li><span class="chip-box" style="background-color:var(--use-res-mid)"></span>Medium Residential</li>
+        <li><span class="chip-box" style="background-color:var(--use-res-low)"></span>Low Residential</li>
+        <li><span class="chip-box" style="background-color:var(--use-ind)"></span>Industrial</li>
+        <li><span class="chip-box" style="background-color:var(--use-park)"></span>Park &amp; Greenspace</li>
+        <li><span class="chip-box" style="background-color:var(--use-vacant)"></span>Vacant Lot</li>
+      </ul>
+    </div>
+
+    <div class="credit">
+      Streets grow one segment at a time through a shared graph — snapping, splitting, and dead-ending against what came before. A 90°-symmetric orientation field keeps the fabric near-rectilinear while it drifts across town; some cities plat a formal grid or two, some never do. Rail, the interstate, water, and parks all sever the weave.
+    </div>
+  </div>
+
+  <div class="pane" id="paneDesigner" role="tabpanel" aria-labelledby="tabDesigner" hidden>
+    <div class="section section--first">
+      <h2>Draw on the map</h2>
+      <div id="designBody"></div>
+    </div>
+
+    <div class="section">
+      <h2>Direction spec</h2>
+      <!-- autocomplete=off so the JSON on screen always reflects the live spec
+           (the share hash, not browser form restoration, carries it across loads) -->
+      <textarea id="dirSpec" rows="6" spellcheck="false" autocomplete="off" aria-label="Direction spec JSON"
+        placeholder='Paste a direction spec (JSON) — geography, plan, maps, interventions, scenario…'></textarea>
+      <div class="btnrow">
+        <button id="dirApply">Apply direction</button>
+        <button id="dirClear">Clear</button>
+      </div>
+      <input type="file" id="dirFile" accept=".json,application/json">
+      <div id="dirIssues"></div>
+    </div>
+  </div>
+</aside>
+
+<main id="map">
+  <canvas id="cv" aria-label="Procedurally generated city map"></canvas>
+  <div id="popup-container"></div>
+  <div id="cinePlacard">
+    <div id="cinePlacardYear"></div>
+    <div id="cinePlacardEra"></div>
+  </div>
+  <!-- Rendered visible so the very first (blocking) survey has feedback on screen
+       before main.js starts; main.js hides it once a city is drawn. -->
+  <div id="mapLoading" role="status" aria-live="polite">
+    <div class="loading-card">
+      <div class="loading-compass" aria-hidden="true"></div>
+      <div class="loading-text" id="mapLoadingText">Surveying the city…</div>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>
